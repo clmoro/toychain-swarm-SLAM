@@ -106,8 +106,8 @@ class Controller_1(Node):
  
     # Current position and orientation of the robot in the global 
     # reference frame
-    self.current_x = 2.0
-    self.current_y = -3.0
+    self.current_x = 3.0
+    self.current_y = 0.0
     self.current_yaw = 0.0
  
     ############# WALL FOLLOWING PARAMETERS #######################     

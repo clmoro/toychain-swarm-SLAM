@@ -37,11 +37,11 @@ class OdomSubscriber(Node):
 
     def __init__(self):
         super().__init__('Odom_subscriber')
-        self.subscription = self.create_subscription(Odometry, '/bot1/odom', self.get_rotation, 10)
+        self.subscription = self.create_subscription(Odometry, '/bot2/odom', self.get_rotation, 10)
 
       # self.subscription = self.create_subscription(Odometry, '/bot1/noisy_odom', self.add_noise_callback, 10)
           
-        self.publisher_ = self.create_publisher(Odometry, '/bot1/noisy_odom', 10)
+        self.publisher_ = self.create_publisher(Odometry, '/bot2/noisy_odom', 10)
         #self.br = tf2_ros.TransformBroadcaster(self)
         self.subscription
             #def get_rotation(self, msg):

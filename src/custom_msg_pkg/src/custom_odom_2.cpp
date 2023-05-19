@@ -27,7 +27,7 @@ class PubSub : public rclcpp::Node
       subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/odom", 10,
       std::bind(&PubSub::topic_callback, this, _1));
 
-      publisher_ = this->create_publisher<cslam_common_interfaces::msg::KeyframeOdom>("r1/cslam/keyframe_odom", 10);
+      publisher_ = this->create_publisher<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 10);
       // publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/keyframe_odom", 10);
     }
 
@@ -36,8 +36,12 @@ class PubSub : public rclcpp::Node
     {
       auto message = cslam_common_interfaces::msg::KeyframeOdom();
       message.id = pose_id;
-      // message.odom.header = msg_odometry->header;
+      message.odom.header = msg_odometry->header;
       message.odom.pose = msg_odometry->pose;
+      message.odom.pose.pose.orientation.x = 0.0;
+      message.odom.pose.pose.orientation.y = 0.0;
+      message.odom.pose.pose.orientation.z = 0.0;
+      message.odom.pose.pose.orientation.w = 0.0;
       publisher_-> publish(message);
 
       pose_id ++;

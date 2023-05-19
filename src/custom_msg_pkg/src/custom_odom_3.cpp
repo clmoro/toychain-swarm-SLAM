@@ -38,6 +38,10 @@ class PubSub : public rclcpp::Node
       message.id = pose_id;
       message.odom.header = msg_odometry->header;
       message.odom.pose = msg_odometry->pose;
+      message.odom.pose.pose.orientation.x = 0.0;
+      message.odom.pose.pose.orientation.y = 0.0;
+      message.odom.pose.pose.orientation.z = 0.0;
+      message.odom.pose.pose.orientation.w = 0.0;
       publisher_-> publish(message);
 
       pose_id ++;

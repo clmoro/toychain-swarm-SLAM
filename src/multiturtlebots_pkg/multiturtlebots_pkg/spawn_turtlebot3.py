@@ -26,7 +26,7 @@ def main():
     # Get the file path for the robot model
     sdf_file_path = os.path.join(
         get_package_share_directory("turtlebot3_gazebo"), "models",
-        "turtlebot3_burger", "model.sdf")
+        "turtlebot3_waffle", "model.sdf")
         
     # Create the node
     node = rclpy.create_node("entity_spawner")
@@ -53,6 +53,10 @@ def main():
     request.initial_pose.position.x = float(argv[2])
     request.initial_pose.position.y = float(argv[3])
     request.initial_pose.position.z = float(argv[4])
+    request.initial_pose.orientation.x = float(argv[5])
+    request.initial_pose.orientation.y = float(argv[6])
+    request.initial_pose.orientation.z = float(argv[7])
+    request.initial_pose.orientation.w = float(argv[8])
 
     node.get_logger().info("Sending service request to `/spawn_entity`")
     future = client.call_async(request)

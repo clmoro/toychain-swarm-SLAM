@@ -2,6 +2,7 @@
 # ROS Version: ROS 2 Foxy Fitzroy
  
 ############## IMPORT LIBRARIES #################
+
 # Python math library
 import math 
  
@@ -34,11 +35,11 @@ from rclpy.qos import qos_profile_sensor_data
  
 # Scientific computing library
 import numpy as np 
-
+ 
 # Random library
 from random import randrange
- 
-class Controller_3(Node):
+
+class Controller_6(Node):
   """
   Create a Controller class, which is a subclass of the Node 
   class for ROS2.
@@ -49,7 +50,7 @@ class Controller_3(Node):
     """
     ##################### ROS SETUP ####################################################
     # Initiate the Node class's constructor and give it a name
-    super().__init__('Controller_3')
+    super().__init__('Controller_6')
  
     # Create a subscriber
     # This node subscribes to messages of type Float64MultiArray  
@@ -61,7 +62,7 @@ class Controller_3(Node):
     # The maximum number of queued messages is 10.
     self.subscription = self.create_subscription(
                         Float64MultiArray,
-                        '/bot3/state_est',
+                        '/bot6/state_est',
                         self.state_estimate_callback,
                         10)
     self.subscription  # prevent unused variable warning
@@ -71,7 +72,7 @@ class Controller_3(Node):
     # sensor_msgs/LaserScan     
     self.scan_subscriber = self.create_subscription(
                            LaserScan,
-                           '/bot3/scan',
+                           '/bot6/scan',
                            self.scan_callback,
                            qos_profile=qos_profile_sensor_data)
                             
@@ -82,7 +83,7 @@ class Controller_3(Node):
     # the motion accordingly.
     self.publisher_ = self.create_publisher(
                       Twist, 
-                      '/bot3/cmd_vel', 
+                      '/bot6/cmd_vel', 
                       10)
  
     # Initialize the LaserScan sensor readings to some large value
@@ -94,6 +95,7 @@ class Controller_3(Node):
     self.right_dist = 999999.9 # Right
  
     ################### ROBOT CONTROL PARAMETERS ##################
+
     # Counter for the turning times of the random walker when obstacles
     self.counter_r = 0
     self.counter_l = 0
@@ -104,17 +106,17 @@ class Controller_3(Node):
  
     # Current position and orientation of the robot in the global 
     # reference frame
-    self.current_x = 0.0
-    self.current_y = 3.0
+    self.current_x = -1.5
+    self.current_y = -1.5
     self.current_yaw = 0.0
  
     ############# WALL FOLLOWING PARAMETERS #######################     
-    
+
     self.turning_speed = 1.0  # Turn
  
     # Wall following distance threshold.
     # We want to try to keep within this distance from the wall.
-    self.dist_thresh_wf = 0.50 # in meters 
+    self.dist_thresh_wf = 0.50 # in meters  
  
   def state_estimate_callback(self, msg):
     """
@@ -144,11 +146,11 @@ class Controller_3(Node):
     # (e.g. -90 degrees to 90 degrees....0 to 180 degrees)
  
     #number_of_laser_beams = str(len(msg.ranges))       
-    self.left_dist = msg.ranges[270]
-    self.leftfront_dist = msg.ranges[315]
+    self.right_dist = msg.ranges[270]
+    self.rightfront_dist = msg.ranges[315]
     self.front_dist = msg.ranges[0]
-    self.rightfront_dist = msg.ranges[45]
-    self.right_dist = msg.ranges[90]
+    self.leftfront_dist = msg.ranges[45]
+    self.left_dist = msg.ranges[90]
              
   def follow_wall(self):
     """
@@ -206,17 +208,17 @@ def main(args=None):
     rclpy.init(args=args)
      
     # Create the node
-    controller_3 = Controller_3()
+    controller_6 = Controller_6()
  
     # Spin the node so the callback function is called
     # Pull messages from any topics this node is subscribed to
     # Publish any pending messages to the topics
-    rclpy.spin(controller_3)
+    rclpy.spin(controller_6)
  
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    controller_3.destroy_node()
+    controller_6.destroy_node()
      
     # Shutdown the ROS client library for Python
     rclpy.shutdown()
