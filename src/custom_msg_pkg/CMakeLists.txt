@@ -30,8 +30,16 @@ add_executable(custom_odom_3 src/custom_odom_3.cpp)
 ament_target_dependencies(custom_odom_3 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
 add_executable(custom_odom_4 src/custom_odom_4.cpp)
 ament_target_dependencies(custom_odom_4 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
-add_executable(custom_loop_closure src/custom_loop_closure.cpp)
-ament_target_dependencies(custom_loop_closure rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_odom_5 src/custom_odom_5.cpp)
+ament_target_dependencies(custom_odom_5 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_odom_6 src/custom_odom_6.cpp)
+ament_target_dependencies(custom_odom_6 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_odom_7 src/custom_odom_7.cpp)
+ament_target_dependencies(custom_odom_7 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_odom_8 src/custom_odom_8.cpp)
+ament_target_dependencies(custom_odom_8 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_loop_closure_1 src/custom_loop_closure_1.cpp)
+ament_target_dependencies(custom_loop_closure_1 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
 
 install(TARGETS
   custom_odom_1
@@ -46,7 +54,19 @@ install(TARGETS
   custom_odom_4
   DESTINATION lib/${PROJECT_NAME})
 install(TARGETS
-  custom_loop_closure
+  custom_odom_5
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  custom_odom_6
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  custom_odom_7
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  custom_odom_8
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  custom_loop_closure_1
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.

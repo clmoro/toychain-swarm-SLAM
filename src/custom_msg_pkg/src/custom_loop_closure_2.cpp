@@ -107,28 +107,6 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = odom_2_noisy.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
       message.transform.translation.y = odom_2_noisy.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
 
-/*    TEMPTATIVE TO CONSIDER ORIENTATION
-
-      tf2::Quaternion q_1(odom_1.odom.pose.pose.orientation.x, odom_1.odom.pose.pose.orientation.y, odom_1.odom.pose.pose.orientation.z, odom_1.odom.pose.pose.orientation.w);
-      tf2::Quaternion q_2(odom_2.odom.pose.pose.orientation.x, odom_2.odom.pose.pose.orientation.y, odom_2.odom.pose.pose.orientation.z, odom_2.odom.pose.pose.orientation.w);
-      tf2::Matrix3x3 m_1(q_1);
-      tf2::Matrix3x3 m_2(q_2);
-      double roll_1, pitch_1, yaw_1, roll_2, pitch_2, yaw_2, droll, dpitch, dyaw;
-      m_1.getRPY(roll_1, pitch_1, yaw_1);
-      m_2.getRPY(roll_2, pitch_2, yaw_2);
-      droll = 0.0;
-      dpitch = 0.0;
-      dyaw = - yaw_2;
-      tf2::Quaternion quat;
-      quat.setRPY(droll, dpitch, dyaw);
-      quat = quat.normalize();
-
-      message.transform.rotation.x = quat.x();
-      message.transform.rotation.y = quat.y();
-      message.transform.rotation.z = quat.z();
-      message.transform.rotation.w = quat.w(); 
-*/
-
         publisher_-> publish(message);
 
     }
