@@ -8,4 +8,11 @@
   <node pkg="custom_msg_pkg" exec="custom_odom_7" name="custom_odom_7"/>
   <node pkg="custom_msg_pkg" exec="custom_odom_8" name="custom_odom_8"/>
   <node pkg="custom_msg_pkg" exec="custom_loop_closure_1" name="custom_loop_closure_1"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_2" name="custom_loop_closure_2"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_3" name="custom_loop_closure_3"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_4" name="custom_loop_closure_4"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_5" name="custom_loop_closure_5"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_6" name="custom_loop_closure_6"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_7" name="custom_loop_closure_7"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_8" name="custom_loop_closure_8"/>
 </launch>
