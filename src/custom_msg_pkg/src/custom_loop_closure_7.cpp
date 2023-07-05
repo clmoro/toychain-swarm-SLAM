@@ -198,7 +198,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
   private:
@@ -224,7 +224,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -250,7 +250,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -276,7 +276,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -302,7 +302,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -328,7 +328,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -354,7 +354,7 @@ class LoopClosurePublisher : public rclcpp::Node
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     rclcpp::TimerBase::SharedPtr timer71_;

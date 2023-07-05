@@ -28,9 +28,7 @@ auto odom_5 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_6 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_7 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_8 = cslam_common_interfaces::msg::KeyframeOdom();
-/* NOISY
-auto odom_2_noisy = cslam_common_interfaces::msg::KeyframeOdom();
-*/
+
 float t = 5.0;
 
 class LoopClosurePublisher : public rclcpp::Node
@@ -45,8 +43,11 @@ class LoopClosurePublisher : public rclcpp::Node
       // Subscription 1
       subscription1_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r0/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic1_callback, this, _1));
 
+//!! NOISY
       // Subscription 2
-      subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+      //subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+      subscription2_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/noisy_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+//!!
 
       // Subscription 3
       subscription3_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r2/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic3_callback, this, _1));
@@ -65,11 +66,6 @@ class LoopClosurePublisher : public rclcpp::Node
 
       // Subscription 8
       subscription8_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r7/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic8_callback, this, _1));
-
-/* NOISY
-      // Subscription 2 NOISY
-      subscription2_noisy_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/noisy_odom", 10, std::bind(&LoopClosurePublisher::topic2_noisy_callback, this, _1));
-*/
 
 // PUBLISHERS
 
@@ -116,12 +112,16 @@ class LoopClosurePublisher : public rclcpp::Node
       odom_1.odom.pose = msg->odom.pose;
     }
 
+//!! NOISY
   private:
-    void topic2_callback(const cslam_common_interfaces::msg::KeyframeOdom::SharedPtr msg) const
+    void topic2_callback(const nav_msgs::msg::Odometry::SharedPtr msg) const
     {
-      odom_2.id = msg->id;
-      odom_2.odom.pose = msg->odom.pose;
+      //odom_2.id = msg->id;
+      odom_2.id = odom_1.id;
+      //odom_2.odom.pose = msg->odom.pose;
+      odom_2.odom.pose = msg->pose;
     }
+//!!
 
   private:
     void topic3_callback(const cslam_common_interfaces::msg::KeyframeOdom::SharedPtr msg) const
@@ -164,14 +164,6 @@ class LoopClosurePublisher : public rclcpp::Node
       odom_8.id = msg->id;
       odom_8.odom.pose = msg->odom.pose;
     }
-
-/* NOISY
-  private:
-    void topic2_noisy_callback(const nav_msgs::msg::Odometry::SharedPtr msg) const
-    {
-      odom_2_noisy.odom.pose = msg->pose;
-    }
-*/
 
 // LOOP CLOSURES FUNCTIONS
 
@@ -365,16 +357,16 @@ class LoopClosurePublisher : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr timer27_;
     rclcpp::TimerBase::SharedPtr timer28_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription1_;
-    rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription2_;
+//!! NOISY
+    //rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription2_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription2_;
+//!!
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription3_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription4_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription5_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription6_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription7_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription8_;
-    /* NOISY
-    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription2_noisy_;
-    */
     rclcpp::Publisher<cslam_common_interfaces::msg::InterRobotLoopClosure>::SharedPtr publisher_;
     size_t count_;
 };

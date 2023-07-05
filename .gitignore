@@ -1,4 +1,6 @@
 # ignore directories
+bag_files/
+#
 build/
 #
 install/

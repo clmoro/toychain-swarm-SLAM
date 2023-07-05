@@ -37,20 +37,14 @@ class OdomSubscriber(Node):
 
     def __init__(self):
         super().__init__('Odom_subscriber')
-        self.subscription = self.create_subscription(Odometry, '/bot2/odom', self.get_rotation, 10)
-
-      # self.subscription = self.create_subscription(Odometry, '/bot1/noisy_odom', self.add_noise_callback, 10)
+        self.subscription = self.create_subscription(Odometry, '/bot6/odom', self.get_rotation, 10)
           
-        self.publisher_ = self.create_publisher(Odometry, '/bot2/noisy_odom', 10)
-        #self.br = tf2_ros.TransformBroadcaster(self)
+        self.publisher_ = self.create_publisher(Odometry, '/bot6/noisy_odom', 10)
         self.subscription
-            #def get_rotation(self, msg):
 
     def publish_value(self):
         msg = Odometry()
-        
-     #   self.publisher_.publish(msg)
-        
+                
     def get_rotation(self, msg):
             global last_odom
             global new_odom_frame
@@ -99,23 +93,22 @@ class OdomSubscriber(Node):
                 
                 # dx += np.random.normal(0, sd_dx*sd_dx)
                 # dy += np.random.normal(0, sd_dy*sd_dy)
-                rot1 += np.random.normal(0, sd_rot1*sd_rot1)
-                rot2 += np.random.normal(0, sd_rot2*sd_rot2)
+                # rot1 += np.random.normal(0, sd_rot1*sd_rot1)
+                # rot2 += np.random.normal(0, sd_rot2*sd_rot2)
                 
                 x += dx
                 x += c
                 y += dy
                 y += d
                 z +=  rot1 + rot2
-                c += np.random.normal(0, sd_dx*sd_dx)*0.2
-                d += np.random.normal(0, sd_dy*sd_dy)*0.2
+                c += np.random.normal(0.01, sd_dx*sd_dx)*0.1
+                d += np.random.normal(0.01, sd_dy*sd_dy)*0.1
                 last_odom = msg
 
             ## adding position,yaw back 
             msg.pose.pose.position.x = x
             msg.pose.pose.position.y = y
             quaternion = tf_transformations.quaternion_from_euler(r,p,z)
-            #euler = tf_transformations.euler_from_quaternion(quaternion)
             msg.pose.pose.orientation.x = quaternion[0]
             msg.pose.pose.orientation.y = quaternion[1]
             msg.pose.pose.orientation.z = quaternion[2]
@@ -153,7 +146,7 @@ def main(args=None):
         a3 = rclpy.get_parameter("~alpha3")
     else:
         #a3 = 0.15
-        a3 = 0.15
+        a3 = 0.5
         node.get_logger().warn("alpha3 is set to default")
 
     # alpha 4 is m/degree
@@ -161,7 +154,7 @@ def main(args=None):
         a4 = rclpy.get_parameter("~alpha4")
     else:
         #a4 = 0.10
-        a4 = 0.10
+        a4 = 0.03
         node.get_logger().warn("alpha4 is set to default")         
 
     rclpy.spin(minimal_subscriber)
