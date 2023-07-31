@@ -31,13 +31,7 @@ auto odom_8 = cslam_common_interfaces::msg::KeyframeOdom();
 /* NOISY
 auto odom_2_noisy = cslam_common_interfaces::msg::KeyframeOdom();
 */
-int t2 = 0;
-int t3 = 0;
-int t4 = 0;
-int t5 = 0;
-int t6 = 0;
-int t7 = 0;
-int t8 = 0;
+float t = 5.0;
 
 class LoopClosurePublisher : public rclcpp::Node
 {  
@@ -199,13 +193,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t2 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t2 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
   private:
@@ -226,13 +219,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t3 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t3 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -253,13 +245,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t4 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t4 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -280,13 +271,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t5 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t5 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -307,13 +297,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t6 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t6 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -334,13 +323,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t7 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t7 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     private:
@@ -361,13 +349,12 @@ class LoopClosurePublisher : public rclcpp::Node
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t8 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t8 = 1;}
       else
         message.success = false;
 
-      publisher_-> publish(message);
+      //publisher_-> publish(message);
     }
 
     rclcpp::TimerBase::SharedPtr timer12_;

@@ -28,19 +28,11 @@ auto odom_5 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_6 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_7 = cslam_common_interfaces::msg::KeyframeOdom();
 auto odom_8 = cslam_common_interfaces::msg::KeyframeOdom();
-/* NOISY
-auto odom_2_noisy = cslam_common_interfaces::msg::KeyframeOdom();
-*/
-int t2 = 0;
-int t3 = 0;
-int t4 = 0;
-int t5 = 0;
-int t6 = 0;
-int t7 = 0;
-int t8 = 0;
+
+float t = 5.0;
 
 class LoopClosurePublisher : public rclcpp::Node
-{  
+{
   public:
     LoopClosurePublisher()
     : Node("loop_closure_publisher"), count_(0)
@@ -51,8 +43,11 @@ class LoopClosurePublisher : public rclcpp::Node
       // Subscription 1
       subscription1_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r0/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic1_callback, this, _1));
 
+//!! NOISY
       // Subscription 2
-      subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+      //subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+      subscription2_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/noisy_odom", 10, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+//!!
 
       // Subscription 3
       subscription3_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r2/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic3_callback, this, _1));
@@ -72,11 +67,6 @@ class LoopClosurePublisher : public rclcpp::Node
       // Subscription 8
       subscription8_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r7/cslam/keyframe_odom", 10, std::bind(&LoopClosurePublisher::topic8_callback, this, _1));
 
-/* NOISY
-      // Subscription 2 NOISY
-      subscription2_noisy_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/noisy_odom", 10, std::bind(&LoopClosurePublisher::topic2_noisy_callback, this, _1));
-*/
-
 // PUBLISHERS
 
       // Loop Closure Publisher
@@ -84,33 +74,33 @@ class LoopClosurePublisher : public rclcpp::Node
 
 // LOOP CLOSURES
 
-      // Timer 1-2
-      timer12_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer12_callback, this));
+      // Timer 2-1
+      timer21_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer21_callback, this));
 
-      // Timer 1-3
-      timer13_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer13_callback, this));
+      // Timer 2-3
+      timer23_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer23_callback, this));
 
-      // Timer 1-4
-      timer14_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer14_callback, this));
+      // Timer 2-4
+      timer24_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer24_callback, this));
 
-      // Timer 1-5
-      timer15_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer15_callback, this));
+      // Timer 2-5
+      timer25_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer25_callback, this));
 
-      // Timer 1-6
-      timer16_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer16_callback, this));
+      // Timer 2-6
+      timer26_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer26_callback, this));
 
-      // Timer 1-7
-      timer17_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer17_callback, this));
+      // Timer 2-7
+      timer27_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer27_callback, this));
 
-      // Timer 1-8
-      timer18_ = this->create_wall_timer(
-      50000ms, std::bind(&LoopClosurePublisher::timer18_callback, this));
+      // Timer 2-8
+      timer28_ = this->create_wall_timer(
+      50000ms, std::bind(&LoopClosurePublisher::timer28_callback, this));
     }
 
 // SUBSCRIPTIONS FUNCTIONS
@@ -122,12 +112,16 @@ class LoopClosurePublisher : public rclcpp::Node
       odom_1.odom.pose = msg->odom.pose;
     }
 
+//!! NOISY
   private:
-    void topic2_callback(const cslam_common_interfaces::msg::KeyframeOdom::SharedPtr msg) const
+    void topic2_callback(const nav_msgs::msg::Odometry::SharedPtr msg) const
     {
-      odom_2.id = msg->id;
-      odom_2.odom.pose = msg->odom.pose;
+      //odom_2.id = msg->id;
+      odom_2.id = odom_1.id;
+      //odom_2.odom.pose = msg->odom.pose;
+      odom_2.odom.pose = msg->pose;
     }
+//!!
 
   private:
     void topic3_callback(const cslam_common_interfaces::msg::KeyframeOdom::SharedPtr msg) const
@@ -171,37 +165,28 @@ class LoopClosurePublisher : public rclcpp::Node
       odom_8.odom.pose = msg->odom.pose;
     }
 
-/* NOISY
-  private:
-    void topic2_noisy_callback(const nav_msgs::msg::Odometry::SharedPtr msg) const
-    {
-      odom_2_noisy.odom.pose = msg->pose;
-    }
-*/
-
 // LOOP CLOSURES FUNCTIONS
 
   private:
-    void timer12_callback() const
+    void timer21_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
-      message.robot1_keyframe_id = odom_2.id;
-      message.robot1_id = 1;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
+      message.robot1_keyframe_id = odom_1.id;
+      message.robot1_id = 0;
       
-      dx = odom_2.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_2.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_1.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_1.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t2 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t2 = 1;}
       else
         message.success = false;
 
@@ -209,26 +194,25 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
   private:
-    void timer13_callback() const
+    void timer23_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_3.id;
       message.robot1_id = 2;
       
-      dx = odom_3.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_3.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_3.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_3.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t3 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t3 = 1;}
       else
         message.success = false;
 
@@ -236,26 +220,25 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
     private:
-    void timer14_callback() const
+    void timer24_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_4.id;
       message.robot1_id = 3;
 
-      dx = odom_4.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_4.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_4.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_4.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t4 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t4 = 1;}
       else
         message.success = false;
 
@@ -263,26 +246,25 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
     private:
-    void timer15_callback() const
+    void timer25_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_5.id;
       message.robot1_id = 4;
       
-      dx = odom_5.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_5.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_5.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_5.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t5 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t5 = 1;}
       else
         message.success = false;
 
@@ -290,26 +272,25 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
     private:
-    void timer16_callback() const
+    void timer26_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_6.id;
       message.robot1_id = 5;
       
-      dx = odom_6.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_6.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_6.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_6.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t6 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t6 = 1;}
       else
         message.success = false;
 
@@ -317,26 +298,25 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
     private:
-    void timer17_callback() const
+    void timer27_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_7.id;
       message.robot1_id = 6;
       
-      dx = odom_7.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_7.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_7.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_7.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t7 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t7 = 1;}
       else
         message.success = false;
 
@@ -344,50 +324,49 @@ class LoopClosurePublisher : public rclcpp::Node
     }
 
     private:
-    void timer18_callback() const
+    void timer28_callback() const
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
       
-      message.robot0_keyframe_id = odom_1.id;
-      message.robot0_id = 0;
+      message.robot0_keyframe_id = odom_2.id;
+      message.robot0_id = 1;
       message.robot1_keyframe_id = odom_8.id;
       message.robot1_id = 7;
       
-      dx = odom_8.odom.pose.pose.position.x - odom_1.odom.pose.pose.position.x;
-      dy = odom_8.odom.pose.pose.position.y - odom_1.odom.pose.pose.position.y;
+      dx = odom_8.odom.pose.pose.position.x - odom_2.odom.pose.pose.position.x;
+      dy = odom_8.odom.pose.pose.position.y - odom_2.odom.pose.pose.position.y;
 
       message.transform.translation.x = dx;
       message.transform.translation.y = dy;
 
-      if (t8 == 0){
+      if (sqrt (pow(dx, 2) + pow(dy, 2)) <= t)
         message.success = true;
-        t8 = 1;}
       else
         message.success = false;
 
       publisher_-> publish(message);
     }
 
-    rclcpp::TimerBase::SharedPtr timer12_;
-    rclcpp::TimerBase::SharedPtr timer13_;
-    rclcpp::TimerBase::SharedPtr timer14_;
-    rclcpp::TimerBase::SharedPtr timer15_;
-    rclcpp::TimerBase::SharedPtr timer16_;
-    rclcpp::TimerBase::SharedPtr timer17_;
-    rclcpp::TimerBase::SharedPtr timer18_;
+    rclcpp::TimerBase::SharedPtr timer21_;
+    rclcpp::TimerBase::SharedPtr timer23_;
+    rclcpp::TimerBase::SharedPtr timer24_;
+    rclcpp::TimerBase::SharedPtr timer25_;
+    rclcpp::TimerBase::SharedPtr timer26_;
+    rclcpp::TimerBase::SharedPtr timer27_;
+    rclcpp::TimerBase::SharedPtr timer28_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription1_;
-    rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription2_;
+//!! NOISY
+    //rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription2_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription2_;
+//!!
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription3_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription4_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription5_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription6_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription7_;
     rclcpp::Subscription<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr subscription8_;
-    /* NOISY
-    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription2_noisy_;
-    */
     rclcpp::Publisher<cslam_common_interfaces::msg::InterRobotLoopClosure>::SharedPtr publisher_;
     size_t count_;
 };
@@ -399,33 +378,3 @@ int main(int argc, char * argv[])
   rclcpp::shutdown();
   return 0;
 }
-
-
-
-
-
-
-
-
-
-/*    TEMPTATIVE TO CONSIDER ORIENTATION
-
-      tf2::Quaternion q_1(odom_1.odom.pose.pose.orientation.x, odom_1.odom.pose.pose.orientation.y, odom_1.odom.pose.pose.orientation.z, odom_1.odom.pose.pose.orientation.w);
-      tf2::Quaternion q_2(odom_2.odom.pose.pose.orientation.x, odom_2.odom.pose.pose.orientation.y, odom_2.odom.pose.pose.orientation.z, odom_2.odom.pose.pose.orientation.w);
-      tf2::Matrix3x3 m_1(q_1);
-      tf2::Matrix3x3 m_2(q_2);
-      double roll_1, pitch_1, yaw_1, roll_2, pitch_2, yaw_2, droll, dpitch, dyaw;
-      m_1.getRPY(roll_1, pitch_1, yaw_1);
-      m_2.getRPY(roll_2, pitch_2, yaw_2);
-      droll = 0.0;
-      dpitch = 0.0;
-      dyaw = - yaw_2;
-      tf2::Quaternion quat;
-      quat.setRPY(droll, dpitch, dyaw);
-      quat = quat.normalize();
-
-      message.transform.rotation.x = quat.x();
-      message.transform.rotation.y = quat.y();
-      message.transform.rotation.z = quat.z();
-      message.transform.rotation.w = quat.w(); 
-*/

@@ -54,6 +54,8 @@ add_executable(custom_loop_closure_7 src/custom_loop_closure_7.cpp)
 ament_target_dependencies(custom_loop_closure_7 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
 add_executable(custom_loop_closure_8 src/custom_loop_closure_8.cpp)
 ament_target_dependencies(custom_loop_closure_8 rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
+add_executable(custom_loop_closure src/custom_loop_closure.cpp)
+ament_target_dependencies(custom_loop_closure rclcpp std_msgs cslam_common_interfaces cslam_common_interfaces)
 
 install(TARGETS
   custom_odom_1
@@ -102,6 +104,9 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 install(TARGETS
   custom_loop_closure_8
+  DESTINATION lib/${PROJECT_NAME})
+install(TARGETS
+  custom_loop_closure
   DESTINATION lib/${PROJECT_NAME})
 
 # Install launch files.
