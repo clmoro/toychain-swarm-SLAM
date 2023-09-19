@@ -183,7 +183,8 @@ class LoopClosurePublisher : public rclcpp::Node
 
   private:
     void timer12_callback() const
-    {
+    {if (t2 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -206,11 +207,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
   private:
     void timer13_callback() const
-    {
+    {if (t3 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -233,11 +235,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     private:
     void timer14_callback() const
-    {
+    {if (t4 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -260,11 +263,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     private:
     void timer15_callback() const
-    {
+    {if (t5 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -287,11 +291,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     private:
     void timer16_callback() const
-    {
+    {if (t6 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -314,11 +319,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     private:
     void timer17_callback() const
-    {
+    {if (t7 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -341,11 +347,12 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     private:
     void timer18_callback() const
-    {
+    {if (t8 == 0){
+
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
       float dx = 0.0;
       float dy = 0.0;
@@ -368,7 +375,7 @@ class LoopClosurePublisher : public rclcpp::Node
         message.success = false;
 
       publisher_-> publish(message);
-    }
+    }}
 
     rclcpp::TimerBase::SharedPtr timer12_;
     rclcpp::TimerBase::SharedPtr timer13_;

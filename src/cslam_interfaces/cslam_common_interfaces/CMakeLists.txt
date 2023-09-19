@@ -38,6 +38,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rtabmap_ros REQUIRED)
+find_package(rtabmap_msgs REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/KeyframeRGB.msg"
@@ -68,8 +69,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   geometry_msgs
   nav_msgs
   rtabmap_ros
+  rtabmap_msgs
 )
-
-ament_export_dependencies(rosidl_default_runtime)
 
 ament_package()
