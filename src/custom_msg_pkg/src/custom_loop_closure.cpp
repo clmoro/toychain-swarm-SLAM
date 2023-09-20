@@ -217,7 +217,7 @@ class LoopClosurePublisher : public rclcpp::Node
     {
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
 
-      // All the approved Loop Closures will be published, msg[0] is the ID of the LC approved
+      // All the approved Loop Closures will be published, msg->data[0] is the ID of the LC approved, in this way I know which ones to take from the local database (the "loop_closure" table)
 
       message.robot0_keyframe_id = loop_closure[msg->data[0]][1];
       message.robot0_id = loop_closure[msg->data[0]][2] - 1;
