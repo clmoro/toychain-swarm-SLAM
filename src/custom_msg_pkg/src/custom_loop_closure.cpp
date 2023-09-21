@@ -177,7 +177,7 @@ class LoopClosurePublisher : public rclcpp::Node
           RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << msg->data[0] << " on robot " << candidate[j][0] << " at scene " << msg->data[1]);
           // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-          // The message_transf is a vector of what I want to put on the blockchain: [keyframe0, from: msg->data[0] (remember to do -1), keyframe1, to: candidate[j][0] (remember to do -1), dx, dy]
+          // The message_transf is a vector of what I want to put on the blockchain: [id_LC, keyframe0, from: msg->data[0] (remember to do -1), keyframe1, to: candidate[j][0] (remember to do -1), dx, dy]
           message_transf.data = {id_loop_closure, odom_vector[msg->data[0]-1].id, msg->data[0], candidate[j][4], candidate[j][0], dx, dy};
           publisher_transf_-> publish(message_transf);
 
