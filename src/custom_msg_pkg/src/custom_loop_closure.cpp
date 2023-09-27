@@ -174,37 +174,53 @@ class LoopClosurePublisher : public rclcpp::Node
     {
       auto message_transf = std_msgs::msg::Float64MultiArray();
 
-      float dx = 0.0;
-      float dy = 0.0;
+      // Loop to scan the new peers
+      for (int k = 0; (msg->data[k] != -1) && (k < 8) ; k++) {
 
-      // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
-      //int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
+        // Loop to scan the candidates of the peer
+        for (int j = 0; j < i + 1; j++) {
 
-      if (candidate[j][1] == msg->data[1] && candidate[j][0] != msg->data[0] && candidate[j][0] != 0) {
-      //int random_noise_point_x = -9 + (rand() % 19);
-      //int random_noise_point_y = -9 + (rand() % 19);
+          // Loop to scan the candidates of the publisher
+          for (int z = 0; z < i + 1; z++) {
+
+            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8]) {
+
+              float dx = 0.0;
+              float dy = 0.0;
+
+              // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
+              //int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
+              //int random_noise_point_x = -9 + (rand() % 19);
+              //int random_noise_point_y = -9 + (rand() % 19);
              
-      dx = candidate[j][2] - odom_vector[msg->data[0]-1].odom.pose.pose.position.x; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
-      dy = candidate[j][3] - odom_vector[msg->data[0]-1].odom.pose.pose.position.y; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
+              dx = candidate[j][2] - candidate[z][2]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
+              dy = candidate[j][3] - candidate[z][3]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
 
-      RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << msg->data[0] << " on robot " << candidate[j][0] << " at scene " << msg->data[1]);
-      // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
+              RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[z][0] << " on robot " << candidate[j][0] << " at scene " << candidate[z][1]);
+              // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-      // The message_transf is a vector of what I want to put on the blockchain: [id_LC, keyframe0, from: msg->data[0] (remember to do -1), keyframe1, to: candidate[j][0] (remember to do -1), dx, dy]
-      message_transf.data = {id_loop_closure, odom_vector[msg->data[0]-1].id, msg->data[0], candidate[j][4], candidate[j][0], dx, dy};
-      publisher_transf_-> publish(message_transf);
+              // The message_transf is a vector of what I want to put on the blockchain: [id_LC, keyframe0, from: msg->data[0] (remember to do -1), keyframe1, to: candidate[j][0] (remember to do -1), dx, dy]
+              message_transf.data = {id_loop_closure, candidate[z][4], candidate[z][0], candidate[j][4], candidate[j][0], dx, dy};
+              publisher_transf_-> publish(message_transf);
 
-      loop_closure[id_loop_closure][0] = id_loop_closure;
-      loop_closure[id_loop_closure][1] = odom_vector[msg->data[0]-1].id;
-      loop_closure[id_loop_closure][2] = msg->data[0];
-      loop_closure[id_loop_closure][3] = candidate[j][4];
-      loop_closure[id_loop_closure][4] = candidate[j][0];
-      loop_closure[id_loop_closure][5] = dx;
-      loop_closure[id_loop_closure][6] = dy;
+              loop_closure[id_loop_closure][0] = id_loop_closure;
+              loop_closure[id_loop_closure][1] = candidate[z][4];
+              loop_closure[id_loop_closure][2] = candidate[z][0];
+              loop_closure[id_loop_closure][3] = candidate[j][4];
+              loop_closure[id_loop_closure][4] = candidate[j][0];
+              loop_closure[id_loop_closure][5] = dx;
+              loop_closure[id_loop_closure][6] = dy;
 
-      id_loop_closure++;
+              id_loop_closure++;
+
+            }
+          
+          }
+
+        }
 
       }
+
     }
 
   private:
@@ -262,73 +278,3 @@ int main(int argc, char * argv[])
   return 0;
 }
 
-
-
-
-
-/* EXTRA
-
-        if (candidate[j][1] == msg->data[1] && candidate[j][0] != msg->data[0] && candidate[j][0] != 0 && msg->data[0] != 6 && msg->data[0] != 8)
-        if (j == i && msg->data[0] != 6 && msg->data[0] != 8)
-
-        if (candidate[j][1] == msg->data[1] && candidate[j][0] != msg->data[0] && candidate[j][0] != 0 && msg->data[0] == 6) {
-          int random_noise_point_x = -9 + (rand() % 19);
-          int random_noise_point_y = -9 + (rand() % 19);
-
-          message.robot0_keyframe_id = odom_6.id;
-          message.robot0_id = 5;
-          message.robot1_keyframe_id = odom_8.id;
-          message.robot1_id = candidate[j][0]-1;
-              
-          dx = odom_8.odom.pose.pose.position.x - odom_6.odom.pose.pose.position.x;
-          dy = odom_8.odom.pose.pose.position.y - odom_6.odom.pose.pose.position.y;
-
-          message.transform.translation.x = dx; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
-          message.transform.translation.y = dy; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
-
-          message.success = true;
-
-          RCLCPP_INFO_STREAM(this->get_logger(), "Publishing Loop Closure from robot " << msg->data[0] << " on robot " << candidate[j][0] << " at scene " << msg->data[1]);
-          RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
-          publisher_-> publish(message);
-        }
-        if (j == i && msg->data[0] == 6) {
-          // i is the INDEX in the database, [i][0] is the ROBOT_ID, [i][1] is the SCENE_ID, [i][2] is the ODOMETRY X, [i][3] is the ODOMETRY Y, [i][4] is the KEYFRAME_ID
-          candidate[i][0] = msg->data[0];
-          candidate[i][1] = msg->data[1];
-          candidate[i][2] = odom_vector[1].odom.pose.pose.position.x;
-          candidate[i][3] = odom_vector[1].odom.pose.pose.position.y;
-          candidate[i][4] = odom_vector[1].id;
-          RCLCPP_INFO_STREAM(this->get_logger(), "New Candidate descriptor. Updated database: " <<  i << " - [" << candidate[i][0] << "][" << candidate[i][1] <<"]" << "[" << candidate[i][2] << "][" << candidate[i][3] << "][" << candidate[i][4] <<"]");
-        }
-        if (candidate[j][1] == msg->data[1] && candidate[j][0] != msg->data[0] && candidate[j][0] != 0 && msg->data[0] == 8) {
-          int random_noise_point_x = -9 + (rand() % 19);
-          int random_noise_point_y = -9 + (rand() % 19);
-
-          message.robot0_keyframe_id = odom_8.id;
-          message.robot0_id = 7;
-          message.robot1_keyframe_id = candidate[j][4];
-          message.robot1_id = candidate[j][0]-1;
-             
-          dx = candidate[j][2] - odom_8.odom.pose.pose.position.x;
-          dy = candidate[j][3] - odom_8.odom.pose.pose.position.y;
-
-          message.transform.translation.x = dx; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
-          message.transform.translation.y = dy; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
-
-          message.success = true;
-
-          RCLCPP_INFO_STREAM(this->get_logger(), "Publishing Loop Closure from robot " << msg->data[0] << " on robot " << candidate[j][0] << " at scene " << msg->data[1]);
-          RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
-          publisher_-> publish(message);
-        }
-        if (j == i && msg->data[0] == 8) {
-          // i is the INDEX in the database, [i][0] is the ROBOT_ID, [i][1] is the SCENE_ID, [i][2] is the ODOMETRY X, [i][3] is the ODOMETRY Y, [i][4] is the KEYFRAME_ID
-          candidate[i][0] = msg->data[0];
-          candidate[i][1] = msg->data[1];
-          candidate[i][2] = odom_vector[1].odom.pose.pose.position.x;
-          candidate[i][3] = odom_vector[1].odom.pose.pose.position.y;
-          candidate[i][4] = odom_vector[1].id;
-          RCLCPP_INFO_STREAM(this->get_logger(), "New Candidate descriptor. Updated database: " <<  i << " - [" << candidate[i][0] << "][" << candidate[i][1] <<"]" << "[" << candidate[i][2] << "][" << candidate[i][3] << "][" << candidate[i][4] <<"]");
-        }
-        */
