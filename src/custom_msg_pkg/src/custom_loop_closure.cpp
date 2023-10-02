@@ -35,12 +35,13 @@ auto odom_8 = cslam_common_interfaces::msg::KeyframeOdom();
 std::vector<cslam_common_interfaces::msg::KeyframeOdom> odom_vector(8);
 
 // Constants
-int i = 0;
-int id_loop_closure = 1;
+int id_candidate = 0;
+int id_loop_closure = 0;
 
 // Arrays
 float candidate[10000][5] = {0};
-float loop_closure[10000][8] = {0};
+float loop_closure[10000][13] = {0};
+int candidate_history[10000][8] = {0};
 
 class LoopClosurePublisher : public rclcpp::Node
 {  
@@ -154,19 +155,19 @@ class LoopClosurePublisher : public rclcpp::Node
     {
       auto message_cand = std_msgs::msg::Float64MultiArray();
 
-      // i is the INDEX in the database, [i][0] is the ROBOT_ID, [i][1] is the SCENE_ID, [i][2] is the ODOMETRY X, [i][3] is the ODOMETRY Y, [i][4] is the KEYFRAME_ID
-      candidate[i][0] = msg->data[0];
-      candidate[i][1] = msg->data[1];
-      candidate[i][2] = odom_vector[candidate[i][0]-1].odom.pose.pose.position.x;
-      candidate[i][3] = odom_vector[candidate[i][0]-1].odom.pose.pose.position.y;
-      candidate[i][4] = odom_vector[candidate[i][0]-1].id;
-      RCLCPP_INFO_STREAM(this->get_logger(), "New Candidate descriptor. Updated database: " <<  i + 1 << " - [" << candidate[i][0] << "][" << candidate[i][1] <<"]" << "[" << candidate[i][2] << "][" << candidate[i][3] << "][" << candidate[i][4] <<"]");
+      // id_candidate is the INDEX in the database, [id_candidate][0] is the ROBOT_ID, [id_candidate][1] is the SCENE_ID, [id_candidate][2] is the ODOMETRY X, [id_candidate][3] is the ODOMETRY Y, [id_candidate][4] is the KEYFRAME_ID
+      candidate[id_candidate][0] = msg->data[0];
+      candidate[id_candidate][1] = msg->data[1];
+      candidate[id_candidate][2] = odom_vector[candidate[id_candidate][0]-1].odom.pose.pose.position.x;
+      candidate[id_candidate][3] = odom_vector[candidate[id_candidate][0]-1].odom.pose.pose.position.y;
+      candidate[id_candidate][4] = odom_vector[candidate[id_candidate][0]-1].id;
+      RCLCPP_INFO_STREAM(this->get_logger(), "New Candidate descriptor. Updated database: " <<  id_candidate + 1 << " - [" << candidate[id_candidate][0] << "][" << candidate[id_candidate][1] <<"]" << "[" << candidate[id_candidate][2] << "][" << candidate[id_candidate][3] << "][" << candidate[id_candidate][4] <<"]");
 
-      // The message_cand is a vector of what I want to put on the blockchain: [candidate_id, candidate[i][0], candidate[i][1], candidate[i][2], candidate[i][3], candidate[i][4]]
-      message_cand.data = {i + 1, candidate[i][0],candidate[i][1],candidate[i][2],candidate[i][3],candidate[i][4]};
+      // The message_cand is: [candidate_id, candidate[id_candidate][0], candidate[id_candidate][1], candidate[id_candidate][2], candidate[id_candidate][3], candidate[id_candidate][4]]
+      message_cand.data = {id_candidate+1, candidate[id_candidate][0],candidate[id_candidate][1],candidate[id_candidate][2],candidate[id_candidate][3],candidate[id_candidate][4]};
       publisher_cand_-> publish(message_cand);
 
-      i++;
+      id_candidate++;
     }
 
   private:
@@ -177,14 +178,20 @@ class LoopClosurePublisher : public rclcpp::Node
       // Loop to scan the new peers
       for (int k = 0; (msg->data[k] != -1) && (k < 8) ; k++) {
 
+        RCLCPP_INFO_STREAM(this->get_logger(), "New meeting " << msg->data[8] << " with " << msg->data[k]);
+
         // Loop to scan the candidates of the peer
-        for (int j = 0; j < i + 1; j++) {
+        for (int j = 0; j < id_candidate + 1; j++) {
 
           // Loop to scan the candidates of the publisher
-          for (int z = 0; z < i + 1; z++) {
+          for (int z = 0; z < id_candidate + 1; z++) {
 
-            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8]) {
+            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && candidate_history[j][msg->data[8]-1] == 0 && candidate_history[z][msg->data[k]-1] == 0) {
 
+              std::string str_descriptor_R = "";
+              std::string str_descriptor_S = "";
+              int descriptor_R = 0;
+              int descriptor_S = 0;
               float dx = 0.0;
               float dy = 0.0;
 
@@ -199,19 +206,33 @@ class LoopClosurePublisher : public rclcpp::Node
               RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[z][0] << " on robot " << candidate[j][0] << " at scene " << candidate[z][1]);
               // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-              // The message_transf is a vector of what I want to put on the blockchain: [id_LC, keyframe0, from: msg->data[0] (remember to do -1), keyframe1, to: candidate[j][0] (remember to do -1), dx, dy]
-              message_transf.data = {id_loop_closure, candidate[z][4], candidate[z][0], candidate[j][4], candidate[j][0], dx, dy};
+              // The message_transf is a vector of what I want to put on the blockchain: [descriptor_R, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, descriptor_S, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy]
+              // The univoque descriptors are "ID_Receiver(row candidate) + SCENE" and "ID_Sender(row candidate) + SCENE"
+              str_descriptor_R = std::to_string(j) + std::to_string(candidate[j][1]);
+              str_descriptor_S = std::to_string(z) + std::to_string(candidate[z][1]);
+              descriptor_R = stoi(str_descriptor_R);
+              descriptor_S = stoi(str_descriptor_S);
+
+              message_transf.data = {descriptor_R, candidate[j][0], candidate[j][2], candidate[j][3], candidate[j][4], descriptor_S, candidate[z][0], candidate[z][2], candidate[z][3], candidate[z][4], dx, dy};
               publisher_transf_-> publish(message_transf);
 
-              loop_closure[id_loop_closure][0] = id_loop_closure;
-              loop_closure[id_loop_closure][1] = candidate[z][4];
-              loop_closure[id_loop_closure][2] = candidate[z][0];
-              loop_closure[id_loop_closure][3] = candidate[j][4];
-              loop_closure[id_loop_closure][4] = candidate[j][0];
-              loop_closure[id_loop_closure][5] = dx;
-              loop_closure[id_loop_closure][6] = dy;
+              loop_closure[id_loop_closure][0] = descriptor_R;
+              loop_closure[id_loop_closure][1] = candidate[j][0];
+              loop_closure[id_loop_closure][2] = candidate[j][2];
+              loop_closure[id_loop_closure][3] = candidate[j][3];
+              loop_closure[id_loop_closure][4] = candidate[j][4];
+              loop_closure[id_loop_closure][5] = descriptor_S;
+              loop_closure[id_loop_closure][6] = candidate[z][0];
+              loop_closure[id_loop_closure][7] = candidate[z][2];
+              loop_closure[id_loop_closure][8] = candidate[z][3];
+              loop_closure[id_loop_closure][9] = candidate[z][4];
+              loop_closure[id_loop_closure][10] = dx;
+              loop_closure[id_loop_closure][11] = dy;
 
               id_loop_closure++;
+
+              candidate_history[j][msg->data[8]-1] = 1;
+              candidate_history[z][msg->data[k]-1] = 1;
 
             }
           
@@ -229,19 +250,28 @@ class LoopClosurePublisher : public rclcpp::Node
       auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
 
       // All the approved Loop Closures will be published, msg->data[0] is the ID of the LC approved, in this way I know which ones to take from the local database (the "loop_closure" table)
+      // Remember: robot0_id (Sender) and robot1_id (Receiver) need ROBOT_ID - 1 
 
-      message.robot0_keyframe_id = loop_closure[msg->data[0]][1];
-      message.robot0_id = loop_closure[msg->data[0]][2] - 1;
-      message.robot1_keyframe_id = loop_closure[msg->data[0]][3];
-      message.robot1_id = loop_closure[msg->data[0]][4] - 1;
-      message.transform.translation.x = loop_closure[msg->data[0]][5];
-      message.transform.translation.y = loop_closure[msg->data[0]][6];
-      message.success = true;
+      for (int x = 0; x < id_loop_closure + 1; x++) {
 
-      publisher_-> publish(message);
+        if (loop_closure[x][0] == msg->data[0] && loop_closure[x][5] == msg->data[1]) {
 
-      // Update the "local" database, it means that the loop closure was validated and published
-      loop_closure[msg->data[0]][7] = 1;
+          message.robot0_keyframe_id = loop_closure[x][9];
+          message.robot0_id = loop_closure[x][6] - 1;
+          message.robot1_keyframe_id = loop_closure[x][4];
+          message.robot1_id = loop_closure[x][1] - 1;
+          message.transform.translation.x = loop_closure[x][10];
+          message.transform.translation.y = loop_closure[x][11];
+          message.success = true;
+
+          publisher_-> publish(message);
+
+          // Update the "local" database, it means that the loop closure was validated and published
+          loop_closure[x][12] = 1;
+
+        }
+
+      }
 
     }
 
