@@ -40,7 +40,7 @@ int id_loop_closure = 0;
 
 // Arrays
 float candidate[10000][5] = {0};
-float loop_closure[10000][13] = {0};
+float loop_closure[10000][14] = {0};
 int candidate_history[10000][8] = {0};
 
 class LoopClosurePublisher : public rclcpp::Node
@@ -206,14 +206,14 @@ class LoopClosurePublisher : public rclcpp::Node
               RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[z][0] << " on robot " << candidate[j][0] << " at scene " << candidate[z][1]);
               // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-              // The message_transf is a vector of what I want to put on the blockchain: [descriptor_R, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, descriptor_S, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy]
-              // The univoque descriptors are "ID_Receiver(row candidate) + SCENE" and "ID_Sender(row candidate) + SCENE"
+              // The message_transf is a vector of what I want to put on the blockchain: [descriptor_R, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, descriptor_S, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
+              // The univoque descriptors are "ID_candidate_Receiver(row candidate) + SCENE" and "ID_candidate_Sender(row candidate) + SCENE"
               str_descriptor_R = std::to_string(j) + std::to_string(candidate[j][1]);
               str_descriptor_S = std::to_string(z) + std::to_string(candidate[z][1]);
               descriptor_R = stoi(str_descriptor_R);
               descriptor_S = stoi(str_descriptor_S);
 
-              message_transf.data = {descriptor_R, candidate[j][0], candidate[j][2], candidate[j][3], candidate[j][4], descriptor_S, candidate[z][0], candidate[z][2], candidate[z][3], candidate[z][4], dx, dy};
+              message_transf.data = {descriptor_R, candidate[j][0], candidate[j][2], candidate[j][3], candidate[j][4], descriptor_S, candidate[z][0], candidate[z][2], candidate[z][3], candidate[z][4], dx, dy, candidate[j][1]};
               publisher_transf_-> publish(message_transf);
 
               loop_closure[id_loop_closure][0] = descriptor_R;
@@ -228,6 +228,7 @@ class LoopClosurePublisher : public rclcpp::Node
               loop_closure[id_loop_closure][9] = candidate[z][4];
               loop_closure[id_loop_closure][10] = dx;
               loop_closure[id_loop_closure][11] = dy;
+              loop_closure[id_loop_closure][12] = candidate[j][1];
 
               id_loop_closure++;
 
@@ -267,7 +268,7 @@ class LoopClosurePublisher : public rclcpp::Node
           publisher_-> publish(message);
 
           // Update the "local" database, it means that the loop closure was validated and published
-          loop_closure[x][12] = 1;
+          loop_closure[x][13] = 1;
 
         }
 
