@@ -40,7 +40,7 @@ int id_loop_closure = 0;
 
 // Arrays
 float candidate[10000][5] = {0};
-float loop_closure[10000][14] = {0};
+float loop_closure[10000][13] = {0};
 int candidate_history[10000][8] = {0};
 
 class LoopClosurePublisher : public rclcpp::Node
@@ -175,6 +175,9 @@ class LoopClosurePublisher : public rclcpp::Node
     {
       auto message_transf = std_msgs::msg::Float64MultiArray();
 
+      // To randomize who generate the loop closure between the two (as in Swarm-SLAM)
+      int randombin = rand() % 2;
+
       // Loop to scan the new peers
       for (int k = 0; (msg->data[k] != -1) && (k < 8) ; k++) {
 
@@ -186,54 +189,64 @@ class LoopClosurePublisher : public rclcpp::Node
           // Loop to scan the candidates of the publisher
           for (int z = 0; z < id_candidate + 1; z++) {
 
-            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && candidate_history[j][msg->data[8]-1] == 0 && candidate_history[z][msg->data[k]-1] == 0) {
+            // Check msg->data[k] < msg->data[8], is to execute only once the function, since it's called from both robot every publication
+            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][msg->data[k]-1] == 0 && randombin == 0) || (candidate_history[j][msg->data[8]-1] == 0 && randombin == 1))) {
 
               std::string str_descriptor_R = "";
               std::string str_descriptor_S = "";
-              int descriptor_R = 0;
-              int descriptor_S = 0;
+              int descriptor = 0;
               float dx = 0.0;
               float dy = 0.0;
+              int temp_j = -1;
+              int temp_z = -1;
+
+              if (randombin == 0) {
+                temp_j = j;
+                temp_z = z;
+              }
+              else {
+                temp_j = z;
+                temp_z = j;
+              }
 
               // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
               //int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
               //int random_noise_point_x = -9 + (rand() % 19);
               //int random_noise_point_y = -9 + (rand() % 19);
              
-              dx = candidate[j][2] - candidate[z][2]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
-              dy = candidate[j][3] - candidate[z][3]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
+              dx = candidate[temp_j][2] - candidate[temp_z][2]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
+              dy = candidate[temp_j][3] - candidate[temp_z][3]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
 
-              RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[z][0] << " on robot " << candidate[j][0] << " at scene " << candidate[z][1]);
+              RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[temp_z][0] << " on robot " << candidate[temp_j][0] << " at scene " << candidate[temp_z][1]);
               // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-              // The message_transf is a vector of what I want to put on the blockchain: [descriptor_R, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, descriptor_S, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
-              // The univoque descriptors are "ID_candidate_Receiver(row candidate) + SCENE" and "ID_candidate_Sender(row candidate) + SCENE"
-              str_descriptor_R = std::to_string(j) + std::to_string(candidate[j][1]);
-              str_descriptor_S = std::to_string(z) + std::to_string(candidate[z][1]);
-              descriptor_R = stoi(str_descriptor_R);
-              descriptor_S = stoi(str_descriptor_S);
+              // The message_transf is a vector of what I want to put on the blockchain: [descriptor, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
+              // The univoque descriptors are "row_candidate_table_Receiver/Sender + SCENE" and "ID_candidate_Sender(row candidate) + SCENE"
+              str_descriptor_R = std::to_string(temp_j) + std::to_string(candidate[temp_j][1]);
+              str_descriptor_S = std::to_string(temp_z) + std::to_string(candidate[temp_z][1]);
+              descriptor = stoi(str_descriptor_R + str_descriptor_S);
 
-              message_transf.data = {descriptor_R, candidate[j][0], candidate[j][2], candidate[j][3], candidate[j][4], descriptor_S, candidate[z][0], candidate[z][2], candidate[z][3], candidate[z][4], dx, dy, candidate[j][1]};
+              message_transf.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx, dy, candidate[temp_j][1]};
               publisher_transf_-> publish(message_transf);
 
-              loop_closure[id_loop_closure][0] = descriptor_R;
-              loop_closure[id_loop_closure][1] = candidate[j][0];
-              loop_closure[id_loop_closure][2] = candidate[j][2];
-              loop_closure[id_loop_closure][3] = candidate[j][3];
-              loop_closure[id_loop_closure][4] = candidate[j][4];
-              loop_closure[id_loop_closure][5] = descriptor_S;
-              loop_closure[id_loop_closure][6] = candidate[z][0];
-              loop_closure[id_loop_closure][7] = candidate[z][2];
-              loop_closure[id_loop_closure][8] = candidate[z][3];
-              loop_closure[id_loop_closure][9] = candidate[z][4];
-              loop_closure[id_loop_closure][10] = dx;
-              loop_closure[id_loop_closure][11] = dy;
-              loop_closure[id_loop_closure][12] = candidate[j][1];
+              loop_closure[id_loop_closure][0] = descriptor;
+              loop_closure[id_loop_closure][1] = candidate[temp_j][0];
+              loop_closure[id_loop_closure][2] = candidate[temp_j][2];
+              loop_closure[id_loop_closure][3] = candidate[temp_j][3];
+              loop_closure[id_loop_closure][4] = candidate[temp_j][4];
+              loop_closure[id_loop_closure][5] = candidate[temp_z][0];
+              loop_closure[id_loop_closure][6] = candidate[temp_z][2];
+              loop_closure[id_loop_closure][7] = candidate[temp_z][3];
+              loop_closure[id_loop_closure][8] = candidate[temp_z][4];
+              loop_closure[id_loop_closure][9] = dx;
+              loop_closure[id_loop_closure][10] = dy;
+              loop_closure[id_loop_closure][11] = candidate[temp_j][1];
 
               id_loop_closure++;
 
-              candidate_history[j][msg->data[8]-1] = 1;
-              candidate_history[z][msg->data[k]-1] = 1;
+              // A binary copy of the candidate table to record the LCs creation, every candidate row keeps track of each other robot interaction in the column, N columns
+              int receiver_pos = static_cast<int>(candidate[temp_j][0]);
+              candidate_history[temp_z][receiver_pos-1] = 1;
 
             }
           
@@ -255,20 +268,20 @@ class LoopClosurePublisher : public rclcpp::Node
 
       for (int x = 0; x < id_loop_closure + 1; x++) {
 
-        if (loop_closure[x][0] == msg->data[0] && loop_closure[x][5] == msg->data[1]) {
+        if (loop_closure[x][0] == msg->data[0]) {
 
-          message.robot0_keyframe_id = loop_closure[x][9];
-          message.robot0_id = loop_closure[x][6] - 1;
+          message.robot0_keyframe_id = loop_closure[x][8];
+          message.robot0_id = loop_closure[x][5] - 1;
           message.robot1_keyframe_id = loop_closure[x][4];
           message.robot1_id = loop_closure[x][1] - 1;
-          message.transform.translation.x = loop_closure[x][10];
-          message.transform.translation.y = loop_closure[x][11];
+          message.transform.translation.x = loop_closure[x][9];
+          message.transform.translation.y = loop_closure[x][10];
           message.success = true;
 
           publisher_-> publish(message);
 
           // Update the "local" database, it means that the loop closure was validated and published
-          loop_closure[x][13] = 1;
+          loop_closure[x][12] = 1;
 
         }
 
