@@ -192,9 +192,6 @@ class LoopClosurePublisher : public rclcpp::Node
             // Check msg->data[k] < msg->data[8], is to execute only once the function, since it's called from both robot every publication
             if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][msg->data[k]-1] == 0 && randombin == 0) || (candidate_history[j][msg->data[8]-1] == 0 && randombin == 1))) {
 
-              std::string str_descriptor_R = "";
-              std::string str_descriptor_S = "";
-              int descriptor = 0;
               float dx = 0.0;
               float dy = 0.0;
               int temp_j = -1;
@@ -217,14 +214,18 @@ class LoopClosurePublisher : public rclcpp::Node
               dx = candidate[temp_j][2] - candidate[temp_z][2]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
               dy = candidate[temp_j][3] - candidate[temp_z][3]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
 
-              RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[temp_z][0] << " on robot " << candidate[temp_j][0] << " at scene " << candidate[temp_z][1]);
-              // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
-
               // The message_transf is a vector of what I want to put on the blockchain: [descriptor, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
-              // The univoque descriptors are "row_candidate_table_Receiver/Sender + SCENE" and "ID_candidate_Sender(row candidate) + SCENE"
-              str_descriptor_R = std::to_string(temp_j) + std::to_string(candidate[temp_j][1]);
-              str_descriptor_S = std::to_string(temp_z) + std::to_string(candidate[temp_z][1]);
-              descriptor = stoi(str_descriptor_R + str_descriptor_S);
+              // The univoque descriptors are "SCENE_ID + row_candidate_index_Receiver + ROBOT_ID_R + row_candidate_index_Sender + ROBOT_ID_S"
+              std::string str_descriptor_SCENE = std::to_string(candidate[temp_j][1]);
+              std::string str_descriptor_R = std::to_string(temp_j) + std::to_string(candidate[temp_j][0]);
+              std::string str_descriptor_S = std::to_string(temp_z) + std::to_string(candidate[temp_z][0]);
+              std::string str_descriptor = str_descriptor_SCENE + str_descriptor_R + str_descriptor_S;
+              str_descriptor.erase(remove(str_descriptor.begin(), str_descriptor.end(), '0'), str_descriptor.end());
+              str_descriptor.erase(remove(str_descriptor.begin(), str_descriptor.end(), '.'), str_descriptor.end());
+              int descriptor = stoi(str_descriptor);
+
+              RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[temp_z][0] << " on robot " << candidate[temp_j][0] << " at scene " << candidate[temp_z][1] << " with descriptor " << str_descriptor);
+              // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
               message_transf.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx, dy, candidate[temp_j][1]};
               publisher_transf_-> publish(message_transf);
