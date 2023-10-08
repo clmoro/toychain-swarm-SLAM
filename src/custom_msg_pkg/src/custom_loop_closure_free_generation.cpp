@@ -76,7 +76,7 @@ class LoopClosurePublisher : public rclcpp::Node
       subscription_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/candidate_information", 10, std::bind(&LoopClosurePublisher::topic_candidate_callback, this, _1));
 
       // Subscription to the Blockchain topic
-      subscription_blockchain_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/blockchain_approved_transformation", 100, std::bind(&LoopClosurePublisher::topic_blockchain_callback, this, _1));
+      subscription_blockchain_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/blockchain_approved_transformation", 10, std::bind(&LoopClosurePublisher::topic_blockchain_callback, this, _1));
 
 
 // PUBLISHERS
