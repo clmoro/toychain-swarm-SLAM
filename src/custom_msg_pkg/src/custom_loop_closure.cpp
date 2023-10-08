@@ -41,7 +41,7 @@ int id_loop_closure = 0;
 // Arrays
 float candidate[10000][5] = {0};
 float loop_closure[10000][13] = {0};
-int candidate_history[10000][8] = {0};
+int candidate_history[10000][10000] = {0};
 
 class LoopClosurePublisher : public rclcpp::Node
 {  
@@ -190,7 +190,7 @@ class LoopClosurePublisher : public rclcpp::Node
           for (int z = 0; z < id_candidate + 1; z++) {
 
             // Check msg->data[k] < msg->data[8], is to execute only once the function, since it's called from both robot every publication
-            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][msg->data[k]-1] == 0 && randombin == 0) || (candidate_history[j][msg->data[8]-1] == 0 && randombin == 1))) {
+            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][j] == 0 && randombin == 0) || (candidate_history[j][z] == 0 && randombin == 1))) {
 
               float dx = 0.0;
               float dy = 0.0;
@@ -217,8 +217,8 @@ class LoopClosurePublisher : public rclcpp::Node
               // The message_transf is a vector of what I want to put on the blockchain: [descriptor, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
               // The univoque descriptors are "SCENE_ID + row_candidate_index_Receiver + ROBOT_ID_R + row_candidate_index_Sender + ROBOT_ID_S"
               std::string str_descriptor_SCENE = std::to_string(candidate[temp_j][1]);
-              std::string str_descriptor_R = std::to_string(temp_j) + std::to_string(candidate[temp_j][0]);
-              std::string str_descriptor_S = std::to_string(temp_z) + std::to_string(candidate[temp_z][0]);
+              std::string str_descriptor_R = std::to_string(temp_j + 1) + std::to_string(candidate[temp_j][0]);
+              std::string str_descriptor_S = std::to_string(temp_z + 1) + std::to_string(candidate[temp_z][0]);
               std::string str_descriptor = str_descriptor_SCENE + str_descriptor_R + str_descriptor_S;
               str_descriptor.erase(remove(str_descriptor.begin(), str_descriptor.end(), '0'), str_descriptor.end());
               str_descriptor.erase(remove(str_descriptor.begin(), str_descriptor.end(), '.'), str_descriptor.end());
@@ -245,9 +245,8 @@ class LoopClosurePublisher : public rclcpp::Node
 
               id_loop_closure++;
 
-              // A binary copy of the candidate table to record the LCs creation, every candidate row keeps track of each other robot interaction in the column, N columns
-              int receiver_pos = static_cast<int>(candidate[temp_j][0]);
-              candidate_history[temp_z][receiver_pos-1] = 1;
+              // A binary copy of the candidate table^2 to record the LCs creation, every candidate row (rows: Sender) keeps track of each other candidate row (columns: Receiver) interaction in the column
+              candidate_history[temp_z][temp_j] = 1;
 
             }
           
