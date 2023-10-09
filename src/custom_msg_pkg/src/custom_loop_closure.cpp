@@ -190,20 +190,76 @@ class LoopClosurePublisher : public rclcpp::Node
           for (int z = 0; z < id_candidate + 1; z++) {
 
             // Check msg->data[k] < msg->data[8], is to execute only once the function, since it's called from both robot every publication
-            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][j] == 0 && randombin == 0) || (candidate_history[j][z] == 0 && randombin == 1))) {
+            if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && (candidate_history[z][j] == 0 || candidate_history[j][z] == 0)) {
 
               float dx = 0.0;
               float dy = 0.0;
               int temp_j = -1;
               int temp_z = -1;
+              int tmp = 0;
 
-              if (randombin == 0) {
-                temp_j = j;
-                temp_z = z;
+
+              // Scan candidate[][] to compare its values of j,z with all the others
+              for (int p = 0; p < id_candidate + 1; p++) {            
+                // Candidate j was used as a Sender, it will be a Receiver
+                if (candidate_history[j][p] == 1 && candidate_history[z][j] == 0) {
+                  temp_j = j;
+                  temp_z = z;
+                  tmp = 1;
+                  break;
+                }
               }
-              else {
-                temp_j = z;
-                temp_z = j;
+              if (tmp == 0) {
+                for (int p = 0; p < id_candidate + 1; p++) {
+                  // Candidate z was used as a Receiver, it will be a Sender
+                  if (candidate_history[p][z] == 1 && candidate_history[z][j] == 0) {
+                    temp_j = j;
+                    temp_z = z;
+                    tmp = 1;
+                    break;
+                  }
+                }
+              }
+              if (tmp == 0) {
+                for (int p = 0; p < id_candidate + 1; p++) {
+                  // Candidate z was used as a Sender, it will be a Receiver
+                  if (candidate_history[z][p] == 1 && candidate_history[j][z] == 0) {
+                    temp_j = z;
+                    temp_z = j;
+                    tmp = 1;
+                    break;
+                  }
+                }
+              }
+              if (tmp == 0) {
+                for (int p = 0; p < id_candidate + 1; p++) {
+                  // Candidate j was used as a Receiver, it will be a Sender
+                  if (candidate_history[p][j] == 1 && candidate_history[j][z] == 0) {
+                    temp_j = z;
+                    temp_z = j;
+                    tmp = 1;
+                    break;
+                  }
+                }
+              }
+              if (tmp == 0) {
+                // Candidate was not used yet, use it as a Receiver or Sender randomly
+                if (randombin == 0 && candidate_history[z][j] == 0) {
+                  temp_j = j;
+                  temp_z = z;
+                }
+                else if (randombin == 1 && candidate_history[j][z] == 0) {
+                  temp_j = z;
+                  temp_z = j;
+                }
+                else if (candidate_history[z][j] == 0) {
+                  temp_j = j;
+                  temp_z = z;
+                }
+                else if (candidate_history[j][z] == 0) {
+                  temp_j = z;
+                  temp_z = j;
+                }
               }
 
               // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
