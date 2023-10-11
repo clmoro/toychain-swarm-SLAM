@@ -28,7 +28,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='True')
-    world_file_name = 'multiturtlebotsBC_arena_void.world'
+    world_file_name = 'multiturtlebotsBC_arena.world'
     pkg_dir = get_package_share_directory('multiturtlebots_pkg')
 
     world = os.path.join(pkg_dir, 'worlds', world_file_name)
@@ -44,35 +44,35 @@ def generate_launch_description():
     #                    arguments=['-entity', 'demo', 'x', 'y', 'z'],
     #                    output='screen')
     spawn_entity1 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_1', 'bot1', '8.0', '-4.0', '0.0', '0.0', '0.0', '0.7071068', '0.7071068'],
+                        arguments=['turtlebot_1', 'bot1', '3.0', '0.0', '0.0', '0.0', '0.0', '0.0', '1'],
                         output='screen')
 
     spawn_entity2 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_2', 'bot2', '6.0', '7.0', '0.0', '0.0', '0.0', '0.0', '1.0'],
+                        arguments=['turtlebot_2', 'bot2', '1.5', '1.5', '0.0', '0.0', '0.0', '0.3826834', '0.9238795'],
                         output='screen')
 
     spawn_entity3 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_3', 'bot3', '4.0', '0.0', '0.0', '0.0', '0.0', '0.7071068', '-0.7071068'],
+                        arguments=['turtlebot_3', 'bot3', '0.0', '3.0', '0.0', '0.0', '0.0', '0.7071068', '0.7071068'],
                         output='screen')
 
     spawn_entity4 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_4', 'bot4', '-1.5', '7.0', '0.0', '0.0', '0.0', '0.0', '1.0'],
+                        arguments=['turtlebot_4', 'bot4', '-1.5', '1.5', '0.0', '0.0', '0.0', '0.9238795', '0.3826834'],
                         output='screen')
                         
     spawn_entity5 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_5', 'bot5', '-8.0', '6.0', '0.0', '0.0', '0.0', '1', '0'],
+                        arguments=['turtlebot_5', 'bot5', '-3.0', '0.0', '0.0', '0.0', '0.0', '1', '0'],
                         output='screen')
                         
     spawn_entity6 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_6', 'bot6', '-7.0', '-1.5', '0.0', '0.0', '0.0', '0.0', '1.0'],
+                        arguments=['turtlebot_6', 'bot6', '-1.5', '-1.5', '0.0', '0.0', '0.0', '0.9238795', '-0.3826834'],
                         output='screen')
                         
     spawn_entity7 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_7', 'bot7', '-8.0', '-8.0', '0.0', '0.0', '0.0', '0.7071068', '-0.7071068'],
+                        arguments=['turtlebot_7', 'bot7', '0.0', '-3.0', '0.0', '0.0', '0.0', '0.7071068', '-0.7071068'],
                         output='screen')
                         
     spawn_entity8 = Node(package='multiturtlebots_pkg', executable='spawn_turtlebot3',
-                        arguments=['turtlebot_8', 'bot8', '0.0', '-7.0', '0.0', '0.0', '0.0', '-0.7071068', '0.7071068'],
+                        arguments=['turtlebot_8', 'bot8', '1.5', '-1.5', '0.0', '0.0', '0.0', '0.3826834', '-0.9238795'],
                         output='screen')  
                                                                                                                         
 

@@ -100,7 +100,7 @@ class Controller_4(Node):
 
     # Maximum forward speed of the robot in meters per second
     # Any faster than this and the robot risks falling over s=0.025.
-    self.forward_speed = 0.1
+    self.forward_speed = 0.12
  
     # Current position and orientation of the robot in the global 
     # reference frame
