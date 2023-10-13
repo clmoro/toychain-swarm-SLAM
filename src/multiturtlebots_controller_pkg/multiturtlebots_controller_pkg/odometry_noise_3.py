@@ -18,10 +18,10 @@ last_odom.pose.pose.position.y = 100.0
 #The cumulative noisy pose
 pose = [0.0,0.0,0.0]
 
-a1 = 0.08
-a2 = 15.0
-a3 = 0.015
-a4 = 0.0001
+a1 = 50.0
+a2 = 100.0
+a3 = 0.1
+a4 = 0.001
 
 new_odom_frame = ""
 odom_frame = ""

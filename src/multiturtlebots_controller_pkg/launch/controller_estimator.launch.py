@@ -91,7 +91,7 @@ def generate_launch_description():
                 target_action=no8,
                 on_start=[
                     TimerAction(
-                        period=8.0,
+                        period=4.0,
                         actions=[start_register_bag],
                     )
                 ]
@@ -102,7 +102,7 @@ def generate_launch_description():
                 target_action=start_register_bag,
                 on_start=[
                     TimerAction(
-                        period=600.0,
+                        period=2400.0,
                         actions=[EmitEvent(event=Shutdown(reason='Registration finished'))],
                     )
                 ]

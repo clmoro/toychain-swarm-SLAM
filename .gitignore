@@ -1,5 +1,5 @@
 # ignore directories
-bag_files/
+odometry_bag/
 #
 build/
 #
