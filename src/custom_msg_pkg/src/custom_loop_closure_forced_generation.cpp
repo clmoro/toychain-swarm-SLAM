@@ -168,6 +168,20 @@ class LoopClosurePublisher : public rclcpp::Node
       publisher_cand_-> publish(message_cand);
 
       id_candidate++;
+
+      // if (id_candidate == 1) {
+      //   auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
+      //   float dx = odom_vector[1].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
+      //   float dy = odom_vector[1].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
+      //   message.robot0_keyframe_id = odom_vector[0].id;
+      //   message.robot0_id = 0;
+      //   message.robot1_keyframe_id = odom_vector[1].id;
+      //   message.robot1_id = 1;
+      //   message.transform.translation.x = dx;
+      //   message.transform.translation.y = dy;
+      //   message.success = true;
+      //   publisher_-> publish(message);
+      // }
     }
 
   private:
