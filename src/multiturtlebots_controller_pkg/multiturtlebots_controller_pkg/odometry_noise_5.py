@@ -19,8 +19,8 @@ last_odom.pose.pose.position.y = 100.0
 pose = [0.0,0.0,0.0]
 
 a1 = 200.0
-a2 = 100.0
-a3 = 0.1
+a2 = 150.0
+a3 = 1
 a4 = 0.001
 
 new_odom_frame = ""

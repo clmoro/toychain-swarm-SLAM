@@ -21,16 +21,16 @@ pose = [0.0,0.0,0.0]
 # Standard parameters
 # deg/deg
 # a1 = 0.05
-# deg/meter
+# meter/deg
 # a2 = 15.0
 # meter/meter
 # a3 = 0.01
-# meter/deg
+# deg/meter
 # a4 = 0.0001
 
 a1 = 200.0
-a2 = 100.0
-a3 = 0.1
+a2 = 150.0
+a3 = 1
 a4 = 0.001
 
 new_odom_frame = ""

@@ -37,6 +37,7 @@ std::vector<cslam_common_interfaces::msg::KeyframeOdom> odom_vector(8);
 // Constants
 int id_candidate = 0;
 int id_loop_closure = 0;
+int e = 1;
 
 // Arrays
 float candidate[10000][5] = {0};
@@ -169,19 +170,23 @@ class LoopClosurePublisher : public rclcpp::Node
 
       id_candidate++;
 
-      // if (id_candidate == 1) {
-      //   auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
-      //   float dx = odom_vector[1].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
-      //   float dy = odom_vector[1].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
-      //   message.robot0_keyframe_id = odom_vector[0].id;
-      //   message.robot0_id = 0;
-      //   message.robot1_keyframe_id = odom_vector[1].id;
-      //   message.robot1_id = 1;
-      //   message.transform.translation.x = dx;
-      //   message.transform.translation.y = dy;
-      //   message.success = true;
-      //   publisher_-> publish(message);
-      // }
+      // Link from 0 to all in order to have a fully connected graph (no errors)
+      if (id_candidate == e + 8 && e < 8) {
+        auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
+        float dx = 0.0;
+        float dy = 0.0;
+        dx = odom_vector[e].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
+        dy = odom_vector[e].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
+        message.robot0_keyframe_id = odom_vector[0].id;
+        message.robot0_id = 0;
+        message.robot1_keyframe_id = odom_vector[e].id;
+        message.robot1_id = e;
+        message.transform.translation.x = dx;
+        message.transform.translation.y = dy;
+        message.success = true;
+        publisher_-> publish(message);
+        e ++;
+      }
     }
 
   private:
@@ -277,12 +282,12 @@ class LoopClosurePublisher : public rclcpp::Node
               }
 
               // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
-              //int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
-              //int random_noise_point_x = -9 + (rand() % 19);
-              //int random_noise_point_y = -9 + (rand() % 19);
+              int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 1};
+              int noise_point_x = -9 + (rand() % 19);
+              int noise_point_y = -9 + (rand() % 19);
              
-              dx = candidate[temp_j][2] - candidate[temp_z][2]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_x;
-              dy = candidate[temp_j][3] - candidate[temp_z][3]; //+ byzantine_vector[msg->data[0]-1] * random_noise_point_y;
+              dx = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector[int(candidate[temp_z][0]-1)] * noise_point_x;
+              dy = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector[int(candidate[temp_z][0]-1)] * noise_point_y;
 
               // The message_transf is a vector of what I want to put on the blockchain: [descriptor, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
               // The univoque descriptors are "SCENE_ID + row_candidate_index_Receiver + ROBOT_ID_R + row_candidate_index_Sender + ROBOT_ID_S"
