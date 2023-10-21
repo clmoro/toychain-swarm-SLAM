@@ -18,8 +18,8 @@ last_odom.pose.pose.position.y = 100.0
 #The cumulative noisy pose
 pose = [0.0,0.0,0.0]
 
-a1 = 200.0
-a2 = 150.0
+a1 = 150.0
+a2 = 160.0
 a3 = 1
 a4 = 0.001
 

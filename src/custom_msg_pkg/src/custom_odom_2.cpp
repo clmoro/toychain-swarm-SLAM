@@ -14,9 +14,7 @@ using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 int pose_id = 0;
-
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
+int pose_id_n = 0;
 
 class PubSub : public rclcpp::Node
 {
@@ -24,11 +22,13 @@ class PubSub : public rclcpp::Node
     PubSub()
     : Node("pubsub")
     {
-      subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/odom", 10,
+      subscription_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/odom", 100,
       std::bind(&PubSub::topic_callback, this, _1));
+      subscription_noisy_ = this->create_subscription<nav_msgs::msg::Odometry>("/bot2/noisy_odom", 100,
+      std::bind(&PubSub::topic_callback_noisy, this, _1));
 
-      publisher_ = this->create_publisher<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 1000);
-      // publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("/keyframe_odom", 10);
+      publisher_ = this->create_publisher<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom_ideal", 1000);
+      publisher_noisy_ = this->create_publisher<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 1000);
     }
 
   private:
@@ -43,17 +43,30 @@ class PubSub : public rclcpp::Node
       message.odom.pose.pose.orientation.z = 0.0;
       message.odom.pose.pose.orientation.w = 0.0;
       publisher_-> publish(message);
+      publisher_noisy_-> publish(message);
 
       pose_id ++;
+    }
 
-      // auto message = nav_msgs::msg::Odometry();
-      // message.header = msg_odometry->header;
-      // message.pose = msg_odometry->pose;
-      // publisher_-> publish(message);
+  private:
+    void topic_callback_noisy(const nav_msgs::msg::Odometry::SharedPtr msg_odometry) const
+    {
+      auto message = cslam_common_interfaces::msg::KeyframeOdom();
+      message.id = pose_id_n;
+      message.odom.header = msg_odometry->header;
+      message.odom.pose = msg_odometry->pose;
+      message.odom.pose.pose.orientation.x = 0.0;
+      message.odom.pose.pose.orientation.y = 0.0;
+      message.odom.pose.pose.orientation.z = 0.0;
+      message.odom.pose.pose.orientation.w = 0.0;
+      // publisher_noisy_-> publish(message);
+
+      pose_id_n ++;
     }
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_;
-    // rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr subscription_noisy_;
     rclcpp::Publisher<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr publisher_;
+    rclcpp::Publisher<cslam_common_interfaces::msg::KeyframeOdom>::SharedPtr publisher_noisy_;
 };
 
 int main(int argc, char * argv[])

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <bits/stdc++.h>
 
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -54,14 +55,14 @@ class LoopClosurePublisher : public rclcpp::Node
 // SUBSCRIPTIONS
 
       // Subscriptions to Custom Odometry
-      subscription1_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r0/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic1_callback, this, _1));
-      subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
-      subscription3_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r2/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic3_callback, this, _1));
-      subscription4_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r3/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic4_callback, this, _1));
-      subscription5_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r4/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic5_callback, this, _1));
-      subscription6_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r5/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic6_callback, this, _1));
-      subscription7_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r6/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic7_callback, this, _1));
-      subscription8_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r7/cslam/keyframe_odom", 100, std::bind(&LoopClosurePublisher::topic8_callback, this, _1));
+      subscription1_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r0/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic1_callback, this, _1));
+      subscription2_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r1/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic2_callback, this, _1));
+      subscription3_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r2/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic3_callback, this, _1));
+      subscription4_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r3/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic4_callback, this, _1));
+      subscription5_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r4/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic5_callback, this, _1));
+      subscription6_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r5/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic6_callback, this, _1));
+      subscription7_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r6/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic7_callback, this, _1));
+      subscription8_ = this->create_subscription<cslam_common_interfaces::msg::KeyframeOdom>("/r7/cslam/keyframe_odom_ideal", 100, std::bind(&LoopClosurePublisher::topic8_callback, this, _1));
 
       // Subscriptions to Adjacency Matrix
       sub_peers_1_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/peering_1", 10, std::bind(&LoopClosurePublisher::sub_peers_callback, this, _1));
@@ -169,24 +170,6 @@ class LoopClosurePublisher : public rclcpp::Node
       publisher_cand_-> publish(message_cand);
 
       id_candidate++;
-
-      // Link from 0 to all in order to have a fully connected graph (no errors)
-      if (id_candidate == e + 8 && e < 8) {
-        auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
-        float dx = 0.0;
-        float dy = 0.0;
-        dx = odom_vector[e].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
-        dy = odom_vector[e].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
-        message.robot0_keyframe_id = odom_vector[0].id;
-        message.robot0_id = 0;
-        message.robot1_keyframe_id = odom_vector[e].id;
-        message.robot1_id = e;
-        message.transform.translation.x = dx;
-        message.transform.translation.y = dy;
-        message.success = true;
-        publisher_-> publish(message);
-        e ++;
-      }
     }
 
   private:
@@ -226,9 +209,11 @@ class LoopClosurePublisher : public rclcpp::Node
               }
 
               // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
-              int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 1};
-              int noise_point_x = -9 + (rand() % 19);
-              int noise_point_y = -9 + (rand() % 19);
+              int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
+              std::default_random_engine rand_number;
+              std::uniform_real_distribution<double> distribution(-9.0,9.0);
+              float noise_point_x = distribution(rand_number);
+              float noise_point_y = distribution(rand_number);
              
               dx = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector[int(candidate[temp_z][0]-1)] * noise_point_x;
               dy = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector[int(candidate[temp_z][0]-1)] * noise_point_y;
@@ -246,7 +231,7 @@ class LoopClosurePublisher : public rclcpp::Node
               RCLCPP_INFO_STREAM(this->get_logger(), "New Loop Closure from robot " << candidate[temp_z][0] << " on robot " << candidate[temp_j][0] << " at scene " << candidate[temp_z][1] << " with descriptor " << str_descriptor);
               // RCLCPP_INFO_STREAM(this->get_logger(), message.transform.translation.x << " " << message.transform.translation.y << " " << message.robot0_keyframe_id << " " << message.robot0_id << " " << message.robot1_keyframe_id << " " << message.robot1_id);
 
-              message_transf.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx, dy, candidate[temp_j][1]};
+              message_transf.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx, dy, candidate[temp_z][1]};
               publisher_transf_-> publish(message_transf);
 
               loop_closure[id_loop_closure][0] = descriptor;
