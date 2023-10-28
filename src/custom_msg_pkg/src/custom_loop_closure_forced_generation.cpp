@@ -286,7 +286,7 @@ class LoopClosurePublisher : public rclcpp::Node
               }
 
               // The vector that defines which robot is Byzantine, adding random noise to the generation of its transformation
-              int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 1, 1};
+              int byzantine_vector[] = {0, 0, 0, 0, 0, 0, 0, 0};
               std::default_random_engine rand_number;
               std::uniform_real_distribution<double> distribution(-9.0,9.0);
               float noise_point_x = distribution(rand_number);

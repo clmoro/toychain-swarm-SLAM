@@ -75,21 +75,23 @@ class LoopClosurePublisher : public rclcpp::Node
       // Link from 0 to all at starting in order to have a fully connected graph (no errors)
       if (odom_vector[0].id == 100) {
         while (e < 8) {
-          RCLCPP_INFO_STREAM(this->get_logger(), "Connection of r0 with the other individuals ...");
-          auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
-          float dx = 0.0;
-          float dy = 0.0;
-          dx = odom_vector[e].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
-          dy = odom_vector[e].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
-          message.robot0_keyframe_id = odom_vector[0].id;
-          message.robot0_id = 0;
-          message.robot1_keyframe_id = odom_vector[e].id;
-          message.robot1_id = e;
-          message.transform.translation.x = dx;
-          message.transform.translation.y = dy;
-          message.success = true;
-          publisher_-> publish(message);
-          e ++;
+          if(e != 1) {
+            RCLCPP_INFO_STREAM(this->get_logger(), "Connection of r0 with the other individuals ...");
+            auto message = cslam_common_interfaces::msg::InterRobotLoopClosure();
+            float dx = 0.0;
+            float dy = 0.0;
+            dx = odom_vector[e].odom.pose.pose.position.x - odom_vector[0].odom.pose.pose.position.x;
+            dy = odom_vector[e].odom.pose.pose.position.y - odom_vector[0].odom.pose.pose.position.y;
+            message.robot0_keyframe_id = odom_vector[0].id;
+            message.robot0_id = 0;
+            message.robot1_keyframe_id = odom_vector[e].id;
+            message.robot1_id = e;
+            message.transform.translation.x = dx;
+            message.transform.translation.y = dy;
+            message.success = true;
+            publisher_-> publish(message);
+          }
+            e ++;
         }
       }
     }

@@ -43,7 +43,7 @@ class PubSub : public rclcpp::Node
       message.odom.pose.pose.orientation.z = 0.0;
       message.odom.pose.pose.orientation.w = 0.0;
       publisher_-> publish(message);
-      publisher_noisy_-> publish(message);
+      // publisher_noisy_-> publish(message);
 
       pose_id ++;
     }
@@ -59,7 +59,7 @@ class PubSub : public rclcpp::Node
       message.odom.pose.pose.orientation.y = 0.0;
       message.odom.pose.pose.orientation.z = 0.0;
       message.odom.pose.pose.orientation.w = 0.0;
-      // publisher_noisy_-> publish(message);
+      publisher_noisy_-> publish(message);
 
       pose_id_n ++;
     }
