@@ -8,9 +8,9 @@
   <node pkg="custom_msg_pkg" exec="custom_odom_7" name="custom_odom_7"/>
   <node pkg="custom_msg_pkg" exec="custom_odom_8" name="custom_odom_8"/>
   
-  <!-- <node pkg="custom_msg_pkg" exec="starting_loop_closure_generation" name="starting_loop_closure_generation"/> -->
+  <node pkg="custom_msg_pkg" exec="starting_loop_closure_generation" name="starting_loop_closure_generation"/>
   <!-- <node pkg="custom_msg_pkg" exec="custom_loop_closure_free_generation" name="custom_loop_closure_free_generation"/> -->
-  <node pkg="custom_msg_pkg" exec="custom_loop_closure_forced_generation" name="custom_loop_closure_forced_generation"/>
+  <node pkg="custom_msg_pkg" exec="custom_loop_closure_forced_generation" name="custom_loop_closure_forced_generation"/> 
   <!-- <node pkg="custom_msg_pkg" exec="custom_loop_closure_no_blockchain" name="custom_loop_closure_no_blockchain"/> -->
   
 </launch>

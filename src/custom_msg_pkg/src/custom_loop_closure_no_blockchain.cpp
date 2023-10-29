@@ -177,7 +177,7 @@ class LoopClosurePublisher : public rclcpp::Node
             if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && ((candidate_history[z][j] == 0 && randombin == 0) || (candidate_history[j][z] == 0 && randombin == 1))) {
 
               float dx = 0.0;
-              float dy = 0.0;
+              float dy = 0.0; 
               int temp_j = -1;
               int temp_z = -1;
 
