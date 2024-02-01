@@ -77,13 +77,6 @@ class LoopClosurePublisher : public rclcpp::Node
       // Subscription to the Candidate topic
       subscription_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/candidate_information", 10, std::bind(&LoopClosurePublisher::topic_candidate_callback, this, _1));
 
-<<<<<<< HEAD
-=======
-      // Subscription to the Blockchain topic
-      subscription_blockchain_ = this->create_subscription<std_msgs::msg::Int64MultiArray>("/blockchain_approved_transformation", 100, std::bind(&LoopClosurePublisher::topic_blockchain_callback, this, _1));
-
-
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
 // PUBLISHERS
 
       // Candidate for blockchain
@@ -102,15 +95,12 @@ class LoopClosurePublisher : public rclcpp::Node
       publisher_transf_R3 = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_R3", 100);
       publisher_transf_R4 = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_R4", 100);
       publisher_transf_R5 = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_R5", 100);
-<<<<<<< HEAD
       publisher_transf_C0t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C0t", 100);
       publisher_transf_C1t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C1t", 100);
       publisher_transf_C2t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C2t", 100);
       publisher_transf_C3t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C3t", 100);
       publisher_transf_C4t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C4t", 100);
       publisher_transf_C5t = this->create_publisher<std_msgs::msg::Float64MultiArray>("/blockchain_transformation_C5t", 100);
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
 
     }
 
@@ -207,15 +197,12 @@ class LoopClosurePublisher : public rclcpp::Node
       auto message_transf_R3 = std_msgs::msg::Float64MultiArray();
       auto message_transf_R4 = std_msgs::msg::Float64MultiArray();
       auto message_transf_R5 = std_msgs::msg::Float64MultiArray();
-<<<<<<< HEAD
       auto message_transf_C0t = std_msgs::msg::Float64MultiArray();
       auto message_transf_C1t = std_msgs::msg::Float64MultiArray();
       auto message_transf_C2t = std_msgs::msg::Float64MultiArray();
       auto message_transf_C3t = std_msgs::msg::Float64MultiArray();
       auto message_transf_C4t = std_msgs::msg::Float64MultiArray();
       auto message_transf_C5t = std_msgs::msg::Float64MultiArray();
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
 
       // To randomize who generate the loop closure between the two (as in Swarm-SLAM)
       int randombin = rand() % 2;
@@ -234,13 +221,8 @@ class LoopClosurePublisher : public rclcpp::Node
             // Check msg->data[k] < msg->data[8], is to execute only once the function, since it's called from both robot every publication
             if (candidate[j][0] == msg->data[k] && candidate[z][0] == msg->data[8] && candidate[j][1] == candidate[z][1] && msg->data[k] < msg->data[8] && (candidate_history[z][j] == 0 || candidate_history[j][z] == 0)) {
 
-<<<<<<< HEAD
               float dx[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
               float dy[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-=======
-              float dx[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-              float dy[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
               int temp_j = -1;
               int temp_z = -1;
               int tmp = 0;
@@ -372,7 +354,6 @@ class LoopClosurePublisher : public rclcpp::Node
               dy[10] = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector_R4[int(candidate[temp_z][0]-1)] * noise_point_y;
               dx[11] = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector_R5[int(candidate[temp_z][0]-1)] * noise_point_x;
               dy[11] = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector_R5[int(candidate[temp_z][0]-1)] * noise_point_y;
-<<<<<<< HEAD
               dx[12] = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector_C0[int(candidate[temp_z][0]-1)] * 0.9;
               dy[12] = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector_C0[int(candidate[temp_z][0]-1)] * 0.9;
               dx[13] = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector_C1[int(candidate[temp_z][0]-1)] * 0.9;
@@ -385,8 +366,6 @@ class LoopClosurePublisher : public rclcpp::Node
               dy[16] = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector_C4[int(candidate[temp_z][0]-1)] * 0.9;
               dx[17] = candidate[temp_j][2] - candidate[temp_z][2] + byzantine_vector_C5[int(candidate[temp_z][0]-1)] * 0.9;
               dy[17] = candidate[temp_j][3] - candidate[temp_z][3] + byzantine_vector_C5[int(candidate[temp_z][0]-1)] * 0.9;
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
 
               // The message_transf is a vector of what I want to put on the blockchain: [descriptor, ROBOT_ID_R, odom1x_R, odom1y_R, keyframe1_R, ROBOT_ID_S, odom1x_S, odom1y_S, keyframe1_S, dx, dy, SCENE]
               // The univoque descriptors are "SCENE_ID + row_candidate_index_Receiver + ROBOT_ID_R + row_candidate_index_Sender + ROBOT_ID_S"
@@ -413,15 +392,12 @@ class LoopClosurePublisher : public rclcpp::Node
               message_transf_R3.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[9], dy[9], candidate[temp_z][1]};
               message_transf_R4.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[10], dy[10], candidate[temp_z][1]};
               message_transf_R5.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[11], dy[11], candidate[temp_z][1]};
-<<<<<<< HEAD
               message_transf_C0t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[12], dy[12], candidate[temp_z][1]};
               message_transf_C1t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[13], dy[13], candidate[temp_z][1]};
               message_transf_C2t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[14], dy[14], candidate[temp_z][1]};
               message_transf_C3t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[15], dy[15], candidate[temp_z][1]};
               message_transf_C4t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[16], dy[16], candidate[temp_z][1]};
               message_transf_C5t.data = {descriptor, candidate[temp_j][0], candidate[temp_j][2], candidate[temp_j][3], candidate[temp_j][4], candidate[temp_z][0], candidate[temp_z][2], candidate[temp_z][3], candidate[temp_z][4], dx[17], dy[17], candidate[temp_z][1]};
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
               publisher_transf_C0-> publish(message_transf_C0);
               publisher_transf_C1-> publish(message_transf_C1);
               publisher_transf_C2-> publish(message_transf_C2);
@@ -434,15 +410,12 @@ class LoopClosurePublisher : public rclcpp::Node
               publisher_transf_R3-> publish(message_transf_R3);
               publisher_transf_R4-> publish(message_transf_R4);
               publisher_transf_R5-> publish(message_transf_R5);
-<<<<<<< HEAD
               publisher_transf_C0t-> publish(message_transf_C0t);
               publisher_transf_C1t-> publish(message_transf_C1t);
               publisher_transf_C2t-> publish(message_transf_C2t);
               publisher_transf_C3t-> publish(message_transf_C3t);
               publisher_transf_C4t-> publish(message_transf_C4t);
               publisher_transf_C5t-> publish(message_transf_C5t);
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
 
               loop_closure[id_loop_closure][0] = descriptor;
               loop_closure[id_loop_closure][1] = candidate[temp_j][0];
@@ -489,10 +462,6 @@ class LoopClosurePublisher : public rclcpp::Node
     rclcpp::Subscription<std_msgs::msg::Int64MultiArray>::SharedPtr sub_peers_7_;
     rclcpp::Subscription<std_msgs::msg::Int64MultiArray>::SharedPtr sub_peers_8_;
     rclcpp::Subscription<std_msgs::msg::Int64MultiArray>::SharedPtr subscription_;
-<<<<<<< HEAD
-=======
-    rclcpp::Subscription<std_msgs::msg::Int64MultiArray>::SharedPtr subscription_blockchain_;
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
     
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_cand_;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C0;
@@ -507,15 +476,12 @@ class LoopClosurePublisher : public rclcpp::Node
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_R3;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_R4;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_R5;
-<<<<<<< HEAD
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C0t;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C1t;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C2t;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C3t;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C4t;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_transf_C5t;
-=======
->>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
     size_t count_;
 };
 
