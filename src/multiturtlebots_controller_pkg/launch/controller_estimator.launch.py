@@ -58,7 +58,11 @@ def generate_launch_description():
       output='screen')
   no8 = Node(package='multiturtlebots_controller_pkg', executable='odometry_noise_8',
       output='screen')
+<<<<<<< HEAD
   start_register_bag = launch.actions.ExecuteProcess(cmd=['ros2', 'bag', 'record', '-o', 'odometry_bag', '/bot1/odom', '/r0/cslam/keyframe_odom', '/bot2/odom', '/r1/cslam/keyframe_odom', '/bot3/odom', '/r2/cslam/keyframe_odom', '/bot4/odom', '/r3/cslam/keyframe_odom', '/bot5/odom', '/r4/cslam/keyframe_odom', '/bot6/odom', '/r5/cslam/keyframe_odom', '/bot7/odom', '/r6/cslam/keyframe_odom', '/bot8/odom', '/r7/cslam/keyframe_odom', '/blockchain_transformation_C0', '/blockchain_transformation_C1', '/blockchain_transformation_C2', '/blockchain_transformation_C3', '/blockchain_transformation_C4', '/blockchain_transformation_C5', '/blockchain_transformation_R0', '/blockchain_transformation_R1', '/blockchain_transformation_R2', '/blockchain_transformation_R3', '/blockchain_transformation_R4', '/blockchain_transformation_R5', '/blockchain_transformation_C0t', '/blockchain_transformation_C1t', '/blockchain_transformation_C2t', '/blockchain_transformation_C3t', '/blockchain_transformation_C4t', '/blockchain_transformation_C5t'], 
+=======
+  start_register_bag = launch.actions.ExecuteProcess(cmd=['ros2', 'bag', 'record', '-o', 'odometry_bag', '/bot1/odom', '/bot1/noisy_odom', '/bot2/odom', '/bot2/noisy_odom', '/bot3/odom', '/bot3/noisy_odom', '/bot4/odom', '/bot4/noisy_odom', '/bot5/odom', '/bot5/noisy_odom', '/bot6/odom', '/bot6/noisy_odom', '/bot7/odom', '/bot7/noisy_odom', '/bot8/odom', '/bot8/noisy_odom'], 
+>>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
       output='screen')
  
   return LaunchDescription([
@@ -91,7 +95,11 @@ def generate_launch_description():
                 target_action=no8,
                 on_start=[
                     TimerAction(
+<<<<<<< HEAD
                         period=5.0,
+=======
+                        period=4.0,
+>>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
                         actions=[start_register_bag],
                     )
                 ]
@@ -102,7 +110,11 @@ def generate_launch_description():
                 target_action=start_register_bag,
                 on_start=[
                     TimerAction(
+<<<<<<< HEAD
                         period=2400.0,
+=======
+                        period=2700.0,
+>>>>>>> 42dfe2a1a3bbb8073505530247bd1321cc1f37dd
                         actions=[EmitEvent(event=Shutdown(reason='Registration finished'))],
                     )
                 ]
