@@ -102,7 +102,7 @@ class Controller_5(Node):
 
     # Maximum forward speed of the robot in meters per second
     # Any faster than this and the robot risks falling over s=0.025.
-    self.forward_speed = 0.1
+    self.forward_speed = 0.12
  
     # Current position and orientation of the robot in the global 
     # reference frame
@@ -177,13 +177,13 @@ class Controller_5(Node):
     elif (self.front_dist < d or self.leftfront_dist < d) and self.counter_r == 0 and self.counter_l == 0:
       self.wall_following_state = "turn right"
       msg.angular.z = -self.turning_speed
-      n = randrange(1, 200)
+      n = randrange(1, 400)
       self.counter_r = n
 
     elif self.leftfront_dist < d and self.counter_r == 0 and self.counter_l == 0:
       self.wall_following_state = "turn left"
       msg.angular.z = self.turning_speed
-      n = randrange(1, 200)
+      n = randrange(1, 400)
       self.counter_l = n
 
     elif self.counter_r > 0:
