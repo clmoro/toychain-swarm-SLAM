@@ -4,3 +4,7 @@ ROS2 package that contains the code for the simulation experiments and for the b
 **Author**
 
 Angelo Moroncelli
+
+**Credits**
+
+[Pierre-Yves Lajoie](https://github.com/teksander) for [cslam_interfaces](https://github.com/clmoro/toychain-swarm-SLAM/tree/main/src/cslam_interfaces/cslam_common_interfaces).
